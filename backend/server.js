@@ -1,15 +1,13 @@
-import express from 'express'
+import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import morgan from "morgan";
 
-
 const app = express();
 dotenv.config();
 
-import restroRegistrationRouter from './routes/restroRegRoute.js'
-
-
+import restroRegistrationRouter from "./routes/restroRegRoute.js";
+import auditRouter from "./routes/auditRoute.js";
 
 if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
@@ -17,8 +15,8 @@ if (process.env.NODE_ENV !== "production") {
 
 app.use(express.json());
 
-app.use("/api/restaurant", restroRegistrationRouter)
-
+app.use("/api/restaurant", restroRegistrationRouter);
+app.use("/api/audit", auditRouter);
 
 const port = process.env.PORT || 5000;
 
