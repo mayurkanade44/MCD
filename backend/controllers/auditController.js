@@ -1,5 +1,7 @@
 import Audit from "../models/Audit.js";
 import exceljs from "exceljs";
+import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
 
 export const auditReport = async (req, res) => {
   const { restroName, restroManger, restroEmail, auditList, restaurant } =
@@ -19,11 +21,9 @@ export const auditReport = async (req, res) => {
     const auditReport = await Audit.create(req.body);
     const error1 = await auditFile(auditReport);
     if (error1) {
-      return res
-        .status(400)
-        .json({
-          msg: "There is some error while generating a file. Try again later",
-        });
+      return res.status(400).json({
+        msg: "There is some error while generating a file. Try again later",
+      });
     }
     res
       .status(201)
@@ -101,5 +101,29 @@ const auditFile = async (auditReport) => {
   } catch (error) {
     console.log(error);
     return error;
+  }
+};
+
+export const imageUploader = async (req, res) => {
+  try {
+    if (!req.files) {
+      return res.status(400).json({ msg: "No image file found" });
+    }
+
+    const result = await cloudinary.uploader.upload(
+      req.files.image.tempFilePath,
+      {
+        use_filename: true,
+        folder: "mcd",
+      }
+    );
+
+    fs.unlinkSync(req.files.image.tempFilePath);
+    res.status(200).json({ image: result.secure_url });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ msg: "Something went wrong, please try again later" });
   }
 };
