@@ -4,8 +4,6 @@ export const auditReport = async (req, res) => {
   const { restroName, restroManger, restroEmail, auditList, restaurant } =
     req.body;
 
-    console.log(req.body);
-
   try {
     if (
       !restroName ||

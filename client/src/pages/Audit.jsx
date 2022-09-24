@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import RadioSelect from "../components/RadioSelect";
+import { postAudit } from "../redux/auditSlice";
 import { getRestroDetails } from "../redux/restroSlice";
 
 const initialState = {
@@ -19,7 +20,7 @@ const Audit = () => {
   const [finalForm, setFinalForm] = useState({
     restroName: "",
     restroManger: "",
-    restroEmail: "abc@xyz.com",
+    restroEmail: "",
     auditList: [],
   });
   const [question, setQuestion] = useState(0);
@@ -43,9 +44,15 @@ const Audit = () => {
       setFormValue(initialState);
     } else {
       finalForm.auditList.push(formValue);
-      console.log(finalForm);
+      finalForm.restroName = singleRestro.restroName;
+      finalForm.restroManger = singleRestro.restroManger;
+      finalForm.restroEmail = singleRestro.restroEmail;
+      finalForm.restaurant = id;
+      dispatch(postAudit(finalForm));
     }
   };
+
+  const handleSubmit = () => {};
 
   return (
     <div>
@@ -99,10 +106,13 @@ const Audit = () => {
               </div>
             );
           })} */}
+
         {singleRestro && singleRestro.auditList && (
           <div>
             <div className="col-lg-12">
-              <h5>{singleRestro.auditList[question].device}</h5>
+              <h5>
+                {(formValue.device = singleRestro.auditList[question].device)}
+              </h5>
             </div>
             <div className="col-md-6">
               {singleRestro.auditList[question].condition1 &&
