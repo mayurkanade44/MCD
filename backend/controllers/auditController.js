@@ -53,11 +53,11 @@ const auditFile = async (auditReport) => {
     data.map((item, index) => {
       let row = worksheet.getRow(index + 4);
       row.getCell(1).value = item.device;
-      row.getCell(2).value = item.condition1;
-      row.getCell(3).value = item.condition2;
-      row.getCell(4).value = item.condition3;
+      row.getCell(2).value = item.condition1Option;
+      row.getCell(3).value = item.condition2Option;
+      row.getCell(4).value = item.condition3Option;
       row.getCell(5).value = item.location;
-      //   row.getCell(6).value = item.picture;
+      row.getCell(6).value = item.image;
       row.alignment = { vertical: "middle", horizontal: "left" };
       row.commit();
     });
