@@ -3,24 +3,24 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import RadioSelect from "../components/RadioSelect";
-import { postAudit } from "../redux/auditSlice";
+import SelectInput from "../components/SelectInput";
+import { uploadImage, postAudit, clearImage } from "../redux/auditSlice";
 import { getRestroDetails } from "../redux/restroSlice";
 
 const initialState = {
   device: "",
-  condition1: "",
-  condition2: "",
-  condition3: "",
+  condition1Option: "",
+  condition2Option: "",
+  condition3Option: "",
   location: "",
 };
 
 const Audit = () => {
   const { id } = useParams();
+  const { loading, imageLink } = useSelector((store) => store.audit);
   const [formValue, setFormValue] = useState(initialState);
+  const [img, setImg] = useState("");
   const [finalForm, setFinalForm] = useState({
-    restroName: "",
-    restroManger: "",
-    restroEmail: "",
     auditList: [],
   });
   const [question, setQuestion] = useState(0);
@@ -39,96 +39,109 @@ const Audit = () => {
 
   const next = () => {
     if (question < singleRestro.auditList.length - 1) {
-      setQuestion(question + 1);
+      formValue.image = imageLink;
+      if (formValue.condition2Name) {
+        formValue.condition2Option =
+          formValue.condition2Name + formValue.condition2Option;
+      }
       finalForm.auditList.push(formValue);
       setFormValue(initialState);
+      setQuestion(question + 1);
+      clearImage();
     } else {
+      formValue.image = imageLink;
       finalForm.auditList.push(formValue);
       finalForm.restroName = singleRestro.restroName;
       finalForm.restroManger = singleRestro.restroManger;
       finalForm.restroEmail = singleRestro.restroEmail;
       finalForm.restaurant = id;
       dispatch(postAudit(finalForm));
+      clearImage();
     }
   };
 
-  const handleSubmit = () => {};
+  const handleImage = (e) => {
+    const imageFile = e.target.files[0];
+    const myForm = new FormData();
+    myForm.append("image", imageFile);
+    dispatch(uploadImage(myForm));
+  };
 
   return (
     <div>
       <h1 className="text-center mt-3 mb-4 text-primary">MCD Audit Report</h1>
       <div className="row">
-        {/* {singleRestro &&
-          singleRestro.auditList &&
-          singleRestro.auditList.map((item, index) => {
-            return (
-              <div key={index}>
-                <div className="col-lg-12">
-                  <h5>
-                    {index + 1}. {item.device}
-                  </h5>
-                </div>
-                <div className="col-md-6">
-                  {item.condition1 &&
-                    item.condition1
-                      .split(",")
-                      .map((cond, index) => (
-                        <RadioSelect
-                          cond={cond}
-                          key={index}
-                          name="condition1"
-                          handleChange={handleChange}
-                        />
-                      ))}
-                </div>
-                <div className="col-md-6">
-                  {item.condition2 &&
-                    item.condition2
-                      .split(",")
-                      .map((cond, index) => (
-                        <RadioSelect cond={cond} key={index} />
-                      ))}
-                </div>
-                <div className="col-md-6">
-                  {item.condition3 &&
-                    item.condition3
-                      .split(",")
-                      .map((cond, index) => (
-                        <RadioSelect cond={cond} key={index} />
-                      ))}
-                </div>
-                {item.location && (
-                  <div className="col-md-6">Location - {item.location}</div>
-                )}
-                <button className="btn btn-success btn-sm" onClick={next}>
-                  Next
-                </button>
-              </div>
-            );
-          })} */}
-
         {singleRestro && singleRestro.auditList && (
           <div>
             <div className="col-lg-12">
-              <h5>
+              <h4 className="text-center">
                 {(formValue.device = singleRestro.auditList[question].device)}
-              </h5>
+              </h4>
             </div>
-            <div className="col-md-6">
-              {singleRestro.auditList[question].condition1 &&
-                singleRestro.auditList[question].condition1
-                  .split(",")
-                  .map((cond, index) => (
-                    <RadioSelect
-                      cond={cond}
-                      key={index}
-                      name="condition1"
-                      value={formValue.condition1}
-                      handleChange={handleChange}
-                    />
-                  ))}
+            <div className="col-md-6 my-2">
+              {singleRestro.auditList[question].condition1Name && (
+                <h6>{singleRestro.auditList[question].condition1Name}</h6>
+              )}
+              {singleRestro.auditList[question].condition1Option && (
+                <SelectInput
+                  type="text"
+                  name="condition1Option"
+                  value={formValue.condition1Option}
+                  handleChange={handleChange}
+                  required={true}
+                  labelW=""
+                  data={[
+                    "Select",
+                    ...singleRestro.auditList[question].condition1Option.split(
+                      ","
+                    ),
+                  ]}
+                />
+              )}
             </div>
-            <div className="col-md-6">
+            <div className="col-md-6 my-2">
+              {singleRestro.auditList[question].condition2Name && (
+                <h6>{singleRestro.auditList[question].condition2Name}</h6>
+              )}
+              {singleRestro.auditList[question].condition2Option && (
+                <SelectInput
+                  type="text"
+                  name="condition2Option"
+                  value={formValue.condition2Option}
+                  handleChange={handleChange}
+                  required={true}
+                  labelW=""
+                  data={[
+                    "Select",
+                    ...singleRestro.auditList[question].condition2Option.split(
+                      ","
+                    ),
+                  ]}
+                />
+              )}
+            </div>
+            <div className="col-md-6 my-2">
+              {singleRestro.auditList[question].condition3Name && (
+                <h6>{singleRestro.auditList[question].condition3Name}</h6>
+              )}
+              {singleRestro.auditList[question].condition3Option && (
+                <SelectInput
+                  type="text"
+                  name="condition3Option"
+                  value={formValue.condition3Option}
+                  handleChange={handleChange}
+                  required={true}
+                  labelW=""
+                  data={[
+                    "Select",
+                    ...singleRestro.auditList[question].condition3Option.split(
+                      ","
+                    ),
+                  ]}
+                />
+              )}
+            </div>
+            {/* <div className="col-md-6 my-2">
               {singleRestro.auditList[question].condition2 &&
                 singleRestro.auditList[question].condition2
                   .split(",")
@@ -140,26 +153,17 @@ const Audit = () => {
                       handleChange={handleChange}
                     />
                   ))}
-            </div>
-            <div className="col-md-6">
-              {singleRestro.auditList[question].condition3 &&
-                singleRestro.auditList[question].condition3
-                  .split(",")
-                  .map((cond, index) => (
-                    <RadioSelect
-                      cond={cond}
-                      key={index}
-                      name="condition3"
-                      handleChange={handleChange}
-                    />
-                  ))}
-            </div>
+            </div> */}
+
             {singleRestro.auditList[question].location && (
-              <div className="col-md-6">
+              <div className="col-md-6 my-2">
                 Location - {singleRestro.auditList[question].location}
               </div>
             )}
-            <button className="btn btn-success btn-sm" onClick={next}>
+            <div className="col-md-6 my-2">
+              <input type="file" accept="image/*" onChange={handleImage} />
+            </div>
+            <button className="btn btn-success btn-sm my-2" onClick={next}>
               {question === singleRestro.auditList.length - 1 ? "Save" : "Next"}
             </button>
           </div>

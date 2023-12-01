@@ -50,14 +50,33 @@ const auditFile = async (auditReport) => {
     let row = worksheet.getRow(2);
     row.getCell(1).value = row2;
 
-    data.map((item, index) => {
+    const data1 = [];
+    data.map((item) => {
+      data1.push({
+        device: item.device,
+        condition1Option: item.condition1Option,
+        condition2Option: item.condition2Option,
+        condition3Option: item.condition3Option,
+        location: item.location,
+        imageId: workbook.addImage({
+          filename: item.image,
+          extension: "jpg",
+        }),
+        image: item.image,
+      });
+    });
+
+    data1.map((item, index) => {
       let row = worksheet.getRow(index + 4);
       row.getCell(1).value = item.device;
       row.getCell(2).value = item.condition1Option;
       row.getCell(3).value = item.condition2Option;
       row.getCell(4).value = item.condition3Option;
       row.getCell(5).value = item.location;
-      row.getCell(6).value = item.image;
+      row.getCell(6).value = worksheet.addImage(item.imageId, {
+        tl: { col: 5, row: 3 + index },
+        ext: { width: 80, height: 40 },
+      });
       row.alignment = { vertical: "middle", horizontal: "left" };
       row.commit();
     });
@@ -110,16 +129,16 @@ export const imageUploader = async (req, res) => {
       return res.status(400).json({ msg: "No image file found" });
     }
 
-    const result = await cloudinary.uploader.upload(
-      req.files.image.tempFilePath,
-      {
-        use_filename: true,
-        folder: "mcd",
-      }
-    );
+    // const result = await cloudinary.uploader.upload(
+    //   req.files.image.tempFilePath,
+    //   {
+    //     use_filename: true,
+    //     folder: "mcd",
+    //   }
+    // );
 
-    fs.unlinkSync(req.files.image.tempFilePath);
-    res.status(200).json({ image: result.secure_url });
+    // fs.unlinkSync(req.files.image.tempFilePath);
+    res.status(200).json({ image: req.files.image.tempFilePath });
   } catch (error) {
     console.log(error);
     return res
